@@ -11,7 +11,8 @@
         >
           <div>
             <i class="fas fa-cloud-upload-alt"></i>
-            <br />Drop your audio files here our files here
+            <br />Drop your audio files here ou click to select
+            <br />You can upload multiple files at once
             <br />
           </div>
         </div>
@@ -43,32 +44,38 @@
     <div class="row">
       <div class="col-12" id="button-area">
         <button
-          id="transcriptButton"
+          
+          @click="getMailAddress"
           class="float-left col-6 btn-block btn btn-primary"
           :disabled="noFiles"
         >
           Transcript
           <i class="fas fa-upload"></i>
         </button>
-        <button class="col-6 btn-block btn btn-danger" @click="clearAll">
+        <button :disabled="noFiles" class="col-6 btn-block btn btn-danger" @click="clearAll">
           Clear
           <i class="fas fa-broom"></i>
         </button>
       </div>
     </div>
+    <EmailModal :modal="modal"></EmailModal>
   </div>
 </template>
 
 
 <script>
+import S3 from "aws-s3";
+import EmailModal from "./EmailModal.vue"
 
 export default {
   name: "dragNdrop",
-
+  components:{
+    EmailModal
+  },
   data() {
     return {
       audios: [],
-         modal: false
+      modal:true,
     };
   },
   methods: {
@@ -85,13 +92,13 @@ export default {
         if (file.type.includes("audio")) {
           this.createAudio(file);
         } else {
-         
           this.$swal({
-            title:"Was nein...?",
-            text:"You can't transcribe any other files than audio. Supported files are mp3, ogg, and acc.",
-             icon: "error",
-              button: "Ok. I understand... "
-              //timer: 2000,
+            title: "Was nein...",
+            text:
+              "You can't transcribe any other files than audio. Supported files are mp3, ogg, and acc.",
+            icon: "error",
+            button: "Ok. I understand... ",
+            //timer: 2000,
           });
         }
       }
@@ -105,14 +112,47 @@ export default {
     },
     clearAll() {
       this.audios = [];
+      console.log("cleared");
     },
     removeAudioFile(file) {
       this.audios.splice(this.audios.indexOf(file), 1);
     },
+    getMailAddress() {
+      this.EmailModal.modal = true;
+      /*this.$swal({
+        title: "Good news!",
+        text: "The transciption will be for free! This could take a while. We will send you a download link as soon the files are transcripted. Please enter your Email Address",
+        icon: "success",
+        button: "Aww yiss!",
+      });
+      for (let audio of this.audios) {
+        this.uploadFile(audio);
+      }*/
+    },
+    uploadFile(file) {
+      this.S3Client.uploadFile(file)
+        .then((data) => console.log(data))
+        .catch((err) => console.error(err));
+    },
   },
+
   computed: {
     noFiles() {
       return this.audios.length === 0;
+    },
+    config() {
+      return {
+        bucketName: "transcriptor-eddy-uploads",
+        dirName: "uploads_from_website",
+        region: "eu-central-1",
+        accessKeyId: "AKIAYQP5JGNOKJ7RNKH7",
+        secretAccessKey: "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",
+        s3Url:
+          "https://transcriptor-eddy-uploads.s3.eu-central-1.amazonaws.com/",
+      };
+    },
+    S3Client() {
+      return new S3(this.config);
     },
   },
 };
@@ -135,8 +175,5 @@ export default {
 .cursor-pointer {
   cursor: pointer;
 }
-
-
-
 </style>
 
