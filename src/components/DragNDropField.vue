@@ -166,6 +166,7 @@ export default {
 }
 #dragndrop-field {
   height: 200px;
+  text-align: center;
 }
 
 .drag-bg {
