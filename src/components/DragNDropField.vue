@@ -7,11 +7,11 @@
           @drop.prevent="drop"
           @dragover.prevent="dragover"
           @dragleave="dragleave"
-          class="z-depth-1-half p-3 cursor-pointer"
+          class="z-depth-1-half p-4 cursor-pointer"
         >
           <div>
-            <i class="fas fa-cloud-upload-alt"></i>
-            <br />Drop your audio files here ou click to select
+            <i style="font-size:60px" class="fas fa-upload mb-4"></i>
+            <br />Drop your audio files here or click to select
             <br />You can upload multiple files at once
             <br />
           </div>
@@ -25,57 +25,75 @@
           style="padding: 1.2rem;border: .1rem solid #bbcbd0;border-radius: .2rem;background-color: #fff;max-width: 96rem;"
         >
           <div
-            v-for="(audio,index) of audios"
+            v-for="(audio,index) of getAudios()"
             :key="index"
             style="margin: .4rem;padding: 0 1.28rem;background: #f0f0f0;border: .1rem solid #cfdbde;border-radius: .2rem;font-weight: bold;"
           >
             <span class="col-2">{{index+1}}</span>
-            <span class="col-2">{{audios[index].name}}</span>
+            <span class="col-2">{{audio.name}}</span>
             <span class="col-2"></span>
 
             <span class="col-1">
-              <i class="fas fa-trash-alt cursor-pointer" @click="removeAudioFile(audio)"></i>
+              <i class="fas fa-trash-alt cursor-pointer" @click="removeAudio(audio)"></i>
             </span>
           </div>
         </div>
       </div>
     </div>
+    <form class>
+      <div class="form-row">
+        <div class="col-6 offset-3">
+          <mdb-input
+            size="sm"
+            label="Your email address"
+            type="email"
+            small="We'll never share your email with anyone."
+            v-on:blur="checkmail"
+            v-model="email"
+            invalidFeedback="Please provide a valid email address."
+            validFeedback="Email address looks good!"
+            :inputClass="checkmail() ? 'is-valid' : 'is-invalid'"
+            required
+            :disabled="noFiles"
+          />
+        </div>
+      </div>
+    </form>
 
     <div class="row">
-      <div class="col-12" id="button-area">
-        <button
-          
-          @click="getMailAddress"
-          class="float-left col-6 btn-block btn btn-primary"
-          :disabled="noFiles"
-        >
-          Transcript
-          <i class="fas fa-upload"></i>
-        </button>
-        <button :disabled="noFiles" class="col-6 btn-block btn btn-danger" @click="clearAll">
-          Clear
-          <i class="fas fa-broom"></i>
-        </button>
+      <div class="col-6 offset-3">
+        <router-link to="/free-or-not">
+          <mdb-btn
+            iconRight
+            size="lg"
+            icon="arrow-alt-circle-right"
+            @click="submit"
+            :disabled="!checkmail()"
+            :outline="!checkmail() ? 'primary' : ''"
+            :class="[!checkmail() ? '': 'btn-primary' ,'btn-block', 'btn'] "
+          >Nex Step</mdb-btn>
+        </router-link>
       </div>
     </div>
-    <EmailModal :modal="modal"></EmailModal>
   </div>
 </template>
 
 
 <script>
 import S3 from "aws-s3";
-import EmailModal from "./EmailModal.vue"
+
+import { mdbInput, mdbBtn } from "mdbvue";
 
 export default {
   name: "dragNdrop",
-  components:{
-    EmailModal
+  components: {
+    "mdb-input": mdbInput,
+    "mdb-btn": mdbBtn,
   },
   data() {
     return {
       audios: [],
-      modal:true,
+      email: null,
     };
   },
   methods: {
@@ -92,53 +110,55 @@ export default {
         if (file.type.includes("audio")) {
           this.createAudio(file);
         } else {
-          this.$swal({
-            title: "Was nein...",
-            text:
-              "You can't transcribe any other files than audio. Supported files are mp3, ogg, and acc.",
-            icon: "error",
-            button: "Ok. I understand... ",
-            //timer: 2000,
-          });
+          this.modal = true;
         }
       }
-
       event.currentTarget.classList.remove("drag-bg");
     },
+
     createAudio(file) {
       let newAudio = document.createElement("audio");
       newAudio.src = URL.createObjectURL(file);
-      this.audios.push(file);
+      //this.audios.push(file);
+      this.$store.dispatch("storeAudio", file);
     },
-    clearAll() {
-      this.audios = [];
-      console.log("cleared");
+    removeAudio(audio) {
+      //this.audios.splice(this.audios.indexOf(file), 1);
+      this.$store.dispatch("removeAudio", audio);
     },
-    removeAudioFile(file) {
-      this.audios.splice(this.audios.indexOf(file), 1);
-    },
-    getMailAddress() {
-      this.EmailModal.modal = true;
-      /*this.$swal({
-        title: "Good news!",
-        text: "The transciption will be for free! This could take a while. We will send you a download link as soon the files are transcripted. Please enter your Email Address",
-        icon: "success",
-        button: "Aww yiss!",
-      });
-      for (let audio of this.audios) {
-        this.uploadFile(audio);
-      }*/
+    submit() {
+      console.log("Upload gestartet:");
+      console.log("Email: " + this.email);
+      console.log("Audios :" + this.audios);
+      this.$store.dispatch("setEmail", this.email);
     },
     uploadFile(file) {
       this.S3Client.uploadFile(file)
         .then((data) => console.log(data))
         .catch((err) => console.error(err));
     },
+    checkmail() {
+      if (!this.email) {
+        return false;
+      } else if (!this.validEmail(this.email)) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+
+    validEmail(email) {
+      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
+    getAudios() {
+      return this.$store.getters.getAudios;
+    },
   },
 
   computed: {
     noFiles() {
-      return this.audios.length === 0;
+      return this.$store.getters.getAudios.length === 0;
     },
     config() {
       return {

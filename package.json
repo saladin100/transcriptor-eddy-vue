@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@xkeshi/image-compressor": "^0.5.3",
+    "aws-amplify": "^3.0.23",
+    "aws-amplify-vue": "^2.1.2",
     "aws-s3": "^2.0.5",
     "core-js": "^3.1.2",
     "cropperjs": "^1.5.7",

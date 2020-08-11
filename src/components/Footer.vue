@@ -44,9 +44,9 @@
         <mdb-row class="text-left">
           <mdb-col sm="8">
             &copy; 2020 Copyright: 
-            <router-link to="/">transcriptor-eddy.com</router-link>
+           <!-- <a href="/">transcriptor-eddy.com</a>
           
-            <!--<router-link to="/">Imprint</router-link> |
+            <router-link to="/" > Imprint</router-link> |
               
             <router-link to="/">Privacy & Policy</router-link>|
             <router-link to="/">Terms of use</router-link>-->
