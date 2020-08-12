@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row mb-5">
         <div class="col-12">
-          <h1>Transcriptor Eddy</h1>
+          <h1>Transcriptor Eddymed</h1>
         </div>
       </div>
 

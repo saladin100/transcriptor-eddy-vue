@@ -44,12 +44,12 @@
         <mdb-row class="text-left">
           <mdb-col sm="8">
             &copy; 2020 Copyright: 
-           <!-- <a href="/">transcriptor-eddy.com</a>
+           <a href="/">transcriptor-eddy.com</a>
           
             <router-link to="/" > Imprint</router-link> |
               
-            <router-link to="/">Privacy & Policy</router-link>|
-            <router-link to="/">Terms of use</router-link>-->
+            <router-link to="/">Privacy & Policy</router-link> |
+            <router-link to="/">Terms of use</router-link>
           </mdb-col>
           <mdb-col sm="4" class="text-right">
             <a

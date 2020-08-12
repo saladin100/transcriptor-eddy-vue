@@ -62,15 +62,14 @@
 
     <div class="row">
       <div class="col-6 offset-3">
-        <router-link to="/free-or-not">
+        <router-link  to="/settings">
           <mdb-btn
             iconRight
             size="lg"
             icon="arrow-alt-circle-right"
-            @click="submit"
             :disabled="!checkmail()"
-            :outline="!checkmail() ? 'primary' : ''"
-            :class="[!checkmail() ? '': 'btn-primary' ,'btn-block', 'btn'] "
+            :outline="!checkmail() ? 'primary' : '' "
+            :class="[!checkmail() ? 'btn-primary': 'btn-primary' ,'btn-block', 'btn'] "
           >Nex Step</mdb-btn>
         </router-link>
       </div>
@@ -93,7 +92,7 @@ export default {
   data() {
     return {
       audios: [],
-      email: null,
+      email: this.$store.getters.getEmail,
     };
   },
   methods: {
