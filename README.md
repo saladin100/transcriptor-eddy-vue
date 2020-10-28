@@ -186,6 +186,8 @@ A big ❤️ **thank you to all our users** ❤️ who are working with us to im
  - [MDB React repo](https://github.com/mdbootstrap/React-Bootstrap-with-Material-Design)
 
  - [MDB Angular repo](https://github.com/mdbootstrap/Angular-Bootstrap-with-Material-Design)
+ 
+ - [The Nomad Escape](https://thenomadescape.com/)
 
 # Social Media
 
